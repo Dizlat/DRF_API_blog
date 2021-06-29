@@ -31,3 +31,24 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+# class ActivationSerializer(serializers.Serializer)
+
+
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            user = authenticate(username=email, password=password, request=self.context.get('request'))
+            if not user:
+                raise serializers.ValidationError('Неверно указаны данные')
+        else:
+            raise serializers.ValidationError('Заполните пустые поля')
+        attrs['user'] = user
+        return attrs
