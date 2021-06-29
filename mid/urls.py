@@ -23,10 +23,11 @@ from mid import settings
 router = SimpleRouter()
 router.register('categories', CategoryViewSet)
 router.register('posts', PostViewSet)
+router.register('images', PostImageViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/account/', include('account.urls')),
     path('api/v1/', include(router.urls)),
-    path('api/v1/add-image/', PostImageView.as_view()),
+    # path('api/v1/add-image/', PostImageView.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
