@@ -4,3 +4,4 @@ Pillow==7.1
 djangorestframework==3.11
 python-decouple
 django-filter
+drf-yasg

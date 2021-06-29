@@ -31,11 +31,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-# class ActivationSerializer(serializers.Serializer)
-
-
-
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
@@ -52,3 +47,5 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Заполните пустые поля')
         attrs['user'] = user
         return attrs
+
+

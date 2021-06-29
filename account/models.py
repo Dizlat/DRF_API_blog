@@ -1,5 +1,4 @@
-from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
 from django.db import models
 
@@ -7,7 +6,7 @@ from django.db import models
 class UserManager(BaseUserManager):
     def _create_user(self, email, password, **extra_fields):
         if not email:
-            raise ValueError('Email is required')
+            raise ValueError('Email обьязателен')
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -24,7 +23,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class User(AbstractUser):
+class User(AbstractBaseUser):
     email = models.EmailField(primary_key=True)
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
@@ -54,7 +53,7 @@ class User(AbstractUser):
 
     @staticmethod
     def send_activation_email(email, activation_code):
-        message = f'http://localhost:2000/account/activation/?u={activation_code}'
-        send_mail('Активация аккаунта', message, 'test@gmail.com', [email])
+        message = f'http://localhost:2000/api/v1/activate/?a={activation_code}'
+        send_mail('Активация аккаунта', message, 'test@gmail.com', [email, ])
 
 
