@@ -9,6 +9,12 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('title', )
 
 
+class PostListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+
 class PostSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format='%d/%m/%y %H:%M:%S', read_only=True)
 
@@ -48,4 +54,33 @@ class ImageSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['image'] = self._get_image_url(instance)
         return representation
+
+
+class CommentAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not instance.first_name and not instance.last_name:
+            representation['full_name'] = 'Анонимный пользователь'
+        return representation
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        exclude = ('id', 'author')
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        attrs['author'] = request.user
+        return attrs
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['author'] = CommentAuthorSerializer(instance.author).data
+        return representation
+
 

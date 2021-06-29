@@ -20,6 +20,9 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='posts')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # class Meta:
+    #     ordering = ['title', ]
+
     def __str__(self):
         return self.title
 
@@ -27,5 +30,13 @@ class Post(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to='posts', blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
