@@ -35,6 +35,13 @@ class PostViewSet(ModelViewSet):
             return [IsAuthenticated()]
         return []
 
+    @action(detail=False, methods=['get'])
+    def my_post(self, request):
+        queryset = self.get_queryset()
+        queryset = queryset.filter(author=request.user)
+        serializer = PostSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['POST'])
     def rating(self, request, pk):
         data = request.data.copy()

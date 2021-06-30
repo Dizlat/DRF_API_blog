@@ -57,3 +57,4 @@ class User(AbstractBaseUser):
         send_mail('Активация аккаунта', message, 'test@gmail.com', [email, ])
 
 
+

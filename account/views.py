@@ -1,15 +1,23 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404
-from rest_framework import status
+from rest_framework import status, generics, mixins
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.generics import GenericAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import *
+from main.permissions import IsAuthorPerm
 
 User = get_user_model()
+
+
+# class ProfileView(ListAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = ProfileSerializer
+#     # permission_classes = [IsAuthorPerm, ]
 
 
 class RegisterView(APIView):

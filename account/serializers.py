@@ -4,6 +4,12 @@ from rest_framework import serializers
 User = get_user_model()
 
 
+# class ProfileSerializer(serializers.Serializer):
+#     class Meta:
+#         Model = User
+#         fields = '__all__'
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(min_length=6, required=True)
     password_confirm = serializers.CharField(min_length=6, required=True)
