@@ -1,4 +1,8 @@
+from datetime import timedelta
+
+from django.db.models import Q
 from django.shortcuts import render
+from django.utils import timezone
 from rest_framework import generics, status, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -35,11 +39,28 @@ class PostViewSet(ModelViewSet):
             return [IsAuthenticated()]
         return []
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        days_count = int(self.request.query_params.get('days', 0))
+        if days_count > 0:
+            start_date = timezone.now() - timedelta(days=days_count)
+            queryset = queryset.filter(created_at__gte=start_date)
+        return queryset
+
     @action(detail=False, methods=['get'])
     def my_post(self, request):
         queryset = self.get_queryset()
         queryset = queryset.filter(author=request.user)
         serializer = PostSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        q = request.query_params.get('q')
+        queryset = self.get_queryset()
+        queryset = queryset.filter(Q(title__icontains=q) |
+                                   Q(text__icontains=q))
+        serializer = PostListSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['POST'])
