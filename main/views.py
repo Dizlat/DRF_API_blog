@@ -30,10 +30,19 @@ class PostViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'destroy']:
-            return [IsAuthorPerm() ]
-        elif self.action in ['create_comment', 'create']:
-            return [IsAuthenticated() ]
+            return [IsAuthorPerm()]
+        elif self.action in ['create_comment', 'create', 'like', 'rating']:
+            return [IsAuthenticated()]
         return []
+
+    @action(detail=True, methods=['POST'])
+    def rating(self, request, pk):
+        data = request.data.copy()
+        data['post'] = pk
+        serializer = RatingSerializer(data=data, context={'request': request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['POST'])
     def create_comment(self, request, pk):
@@ -43,6 +52,21 @@ class PostViewSet(ModelViewSet):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['POST'])
+    def like(self, request, pk):
+        post = self.get_object()
+        user = request.user
+        like_obj, created = Like.objects.get_or_create(post=post, user=user)
+
+        if like_obj.is_liked:
+            like_obj.is_liked = False
+            like_obj.save()
+            return Response('disliked')
+        else:
+            like_obj.is_liked = True
+            like_obj.save()
+            return Response('liked')
 
 
 class PostImageViewSet(ModelViewSet):

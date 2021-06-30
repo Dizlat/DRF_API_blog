@@ -40,3 +40,20 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+# class LikeCount(models.Model):
+#     posts = models.ManyToManyField(Post, through='Like')
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+    is_liked = models.BooleanField(default=False)
+    quantity = models.IntegerField(default=0)
+
+
+class Rating(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='ratings')
+    rating = models.SmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    created_at = models.DateTimeField(auto_now_add=True)
+

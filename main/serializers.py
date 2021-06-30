@@ -22,9 +22,19 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = '__all__'
 
+    def get_rating(self, instance):
+        total_rating = sum(instance.ratings.values_list('rating', flat=True))
+        rating_count = instance.ratings.count()
+        rating = total_rating / rating_count if rating_count > 0 else 0
+        return round(rating, 1)
+
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
+        # repr['likes'] = LikeSerializer(instance.likes.id.count(), context=self.context).data
+        repr['rating'] = self.get_rating(instance)
+        print(repr)
+        repr['comment'] = CommentSerializer(instance.comments.all(), many=True, context=self.context).data
         return repr
 
     def create(self, validated_data):
@@ -82,5 +92,44 @@ class CommentSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['author'] = CommentAuthorSerializer(instance.author).data
         return representation
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        field = ('post', 'id')
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        attrs['author'] = request.user
+        return attrs
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        exclude = ('id', 'author', 'created_at')
+
+    def validate_post(self, post):
+        request = self.context.get('request')
+        print(request)
+        print(request)
+        print(request)
+        print(request)
+        if post.ratings.filter(author=request.user).exists():
+            raise serializers.ValidationError('Вы не можете поставить вторую оценку на пост')
+        return post
+
+    def validate_rating(self, rating):
+        if not rating in range(1, 6):
+            raise serializers.ValidationError('Рейтинг должен быть от 1 до 5')
+        return rating
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        attrs['author'] = request.user
+        return attrs
+
+
 
 
