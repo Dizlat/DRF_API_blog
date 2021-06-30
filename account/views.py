@@ -51,3 +51,10 @@ class LogoutView(APIView):
         return Response('Вы успешно вышли из аккаунта', status=status.HTTP_200_OK)
 
 
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.send_new_password()
+            return Response('Вам на почту отправлен ваш новый пароль', status=status.HTTP_200_OK)
+

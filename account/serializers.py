@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model, authenticate
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
 from rest_framework import serializers
 
 User = get_user_model()
@@ -55,3 +57,23 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, email):
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('Нет такого пользователя')
+        return email
+
+    def send_new_password(self):
+        email = self.validated_data.get('email')
+        new_pass = get_random_string(length=8)
+        user = User.objects.get(email=email)
+        user.set_password(new_pass)
+        user.save()
+        send_mail(
+            'Восстановление пароля',
+            f'Ваш новый пароль: {new_pass}',
+            'test@gmail.com',
+            [email]
+        )
