@@ -28,10 +28,15 @@ class PostSerializer(serializers.ModelSerializer):
         rating = total_rating / rating_count if rating_count > 0 else 0
         return round(rating, 1)
 
+    def get_like(self, instance):
+        total_like = sum(instance.likes.values_list('is_liked', flat=True))
+        like = total_like if total_like > 0 else 0
+        return round(like, 1)
+
     def to_representation(self, instance):
         repr = super().to_representation(instance)
         repr['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
-        # repr['likes'] = LikeSerializer(instance.likes.id.count(), context=self.context).data
+        repr['likes'] = self.get_like(instance)
         repr['rating'] = self.get_rating(instance)
         print(repr)
         repr['comment'] = CommentSerializer(instance.comments.all(), many=True, context=self.context).data
@@ -94,17 +99,6 @@ class CommentSerializer(serializers.ModelSerializer):
         return representation
 
 
-class LikeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Like
-        field = ('post', 'id')
-
-    def validate(self, attrs):
-        request = self.context.get('request')
-        attrs['author'] = request.user
-        return attrs
-
-
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
@@ -112,10 +106,6 @@ class RatingSerializer(serializers.ModelSerializer):
 
     def validate_post(self, post):
         request = self.context.get('request')
-        print(request)
-        print(request)
-        print(request)
-        print(request)
         if post.ratings.filter(author=request.user).exists():
             raise serializers.ValidationError('Вы не можете поставить вторую оценку на пост')
         return post
@@ -131,5 +121,16 @@ class RatingSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = '__all__'
 
+
+class FavoriteListSerializer(serializers.ModelSerializer):
+    posts = FavoriteSerializer(many=True)
+
+    class Meta:
+        model = FavoriteList
+        fields = '__all__'
 

@@ -96,6 +96,21 @@ class PostViewSet(ModelViewSet):
             like_obj.save()
             return Response('liked')
 
+    # @action(detail=True, methods=['POST'])
+    # def favorite(self, request, pk):
+    #     post = self.get_object()
+    #     user = request.user
+    #     favorite_obj, created = Favorite.objects.get_or_create(post=post, user=user)
+    #
+    #     if favorite_obj.is_favorited:
+    #         favorite_obj.is_favorited = False
+    #         favorite_obj.save()
+    #         return Response('удален из избранного')
+    #     else:
+    #         favorite_obj.is_favorited = True
+    #         favorite_obj.save()
+    #         return Response('добавлен в избраное')
+
 
 class PostImageViewSet(ModelViewSet):
     queryset = Image.objects.all()
@@ -124,6 +139,15 @@ class PostImageViewSet(ModelViewSet):
 #             return [IsAuthenticated, ]
 #         return [IsAuthorPerm, ]
 
+class FavoriteView(ModelViewSet):
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteListSerializer
+    # permission_classes = [IsAuthorPerm, ]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+        return queryset
 
 

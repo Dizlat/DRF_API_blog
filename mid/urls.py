@@ -24,7 +24,7 @@ router = SimpleRouter()
 router.register('categories', CategoryViewSet)
 router.register('posts', PostViewSet)
 router.register('images', PostImageViewSet)
-
+router.register('favorite', FavoriteView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

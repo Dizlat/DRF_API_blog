@@ -58,4 +58,12 @@ class Rating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class FavoriteList(models.Model):
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='favorites_list')
+    posts = models.ManyToManyField(Post, through='Favorite')
 
+
+class Favorite(models.Model):
+    favorite = models.ForeignKey(FavoriteList, on_delete=models.DO_NOTHING, related_name='favorites_list')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='favorites')
+    is_favorited = models.BooleanField(default=False)
