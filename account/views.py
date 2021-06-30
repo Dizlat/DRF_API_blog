@@ -58,3 +58,16 @@ class ForgotPasswordView(APIView):
             serializer.send_new_password()
             return Response('Вам на почту отправлен ваш новый пароль', status=status.HTTP_200_OK)
 
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+    def post(self, request):
+        print(request.data)
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.set_new_password(request)
+            return Response('Вы успешно сменили пароль', status=status.HTTP_200_OK)
