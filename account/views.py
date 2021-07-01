@@ -69,7 +69,6 @@ class ChangePasswordView(APIView):
 
 
 class ProfileDetailViewSet(mixins.RetrieveModelMixin,
-                           mixins.UpdateModelMixin,
                            mixins.ListModelMixin,
                            GenericViewSet):
     queryset = User.objects.all()

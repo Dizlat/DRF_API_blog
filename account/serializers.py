@@ -21,16 +21,7 @@ class ProfileListSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name')
-
-    def validate(self, attrs):
-        request = self.context.get('request')
-        attrs['email'] = request.user
-        return attrs
-
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     representation['email'] = instance.email
+        fields = ('first_name', 'last_name')
 
 
 class RegisterSerializer(serializers.ModelSerializer):

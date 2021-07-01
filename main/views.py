@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet, GenericViewSet
 
 from .models import *
-from .permissions import IsAuthorPerm, IsAuthorImagePerm
+from .permissions import IsAuthorPerm, IsAuthorImagePerm, IsAuthorUserPerm
 from .serializers import *
 
 
@@ -35,7 +35,7 @@ class PostViewSet(ModelViewSet):
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'destroy']:
             return [IsAuthorPerm()]
-        elif self.action in ['create_comment', 'create', 'like', 'rating']:
+        elif self.action in ['create_comment', 'create', 'like', 'rating', 'favorite']:
             return [IsAuthenticated()]
         return []
 
@@ -96,6 +96,21 @@ class PostViewSet(ModelViewSet):
             like_obj.save()
             return Response('liked')
 
+    @action(detail=True, methods=['POST'])
+    def favorite(self, request, pk):
+        post = self.get_object()
+        user = request.user
+        favorite, created = Favorite.objects.get_or_create(post=post, user=user)
+
+        if favorite.is_favorited:
+            favorite.is_favorited = False
+            favorite.save()
+            return Response('удален из избранного')
+        else:
+            favorite.is_favorited = True
+            favorite.save()
+            return Response('Добавлен в избранное')
+
     # @action(detail=True, methods=['POST'])
     # def favorite(self, request, pk):
     #     post = self.get_object()
@@ -139,15 +154,17 @@ class PostImageViewSet(ModelViewSet):
 #             return [IsAuthenticated, ]
 #         return [IsAuthorPerm, ]
 
-class FavoriteView(ModelViewSet):
+class FavoriteView(ReadOnlyModelViewSet):
     queryset = Favorite.objects.all()
-    serializer_class = FavoriteListSerializer
-    # permission_classes = [IsAuthorPerm, ]
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def get_serializer_context(self):
+        return {'request': self.request}
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if not self.request.user.is_staff:
-            queryset = queryset.filter(user=self.request.user)
+        queryset = queryset.filter(user=self.request.user)
         return queryset
 
 

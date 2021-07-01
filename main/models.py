@@ -28,7 +28,6 @@ class Post(models.Model):
 
 
 class Image(models.Model):
-    # author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='posts', blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
 
@@ -39,10 +38,6 @@ class Comment(models.Model):
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-
-# class LikeCount(models.Model):
-#     posts = models.ManyToManyField(Post, through='Like')
 
 
 class Like(models.Model):
@@ -59,12 +54,7 @@ class Rating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class FavoriteList(models.Model):
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='favorites_list')
-    posts = models.ManyToManyField(Post, through='Favorite')
-
-
 class Favorite(models.Model):
-    favorite = models.ForeignKey(FavoriteList, on_delete=models.DO_NOTHING, related_name='favorites_list')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorites')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='favorites')
     is_favorited = models.BooleanField(default=False)

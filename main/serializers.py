@@ -43,10 +43,11 @@ class PostSerializer(serializers.ModelSerializer):
     def get_like(self, instance):
         total_like = sum(instance.likes.values_list('is_liked', flat=True))
         like = total_like if total_like > 0 else 0
-        return round(like, 1)
+        return like
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
+        repr['category'] = CategorySerializer(instance.category).data
         repr['author'] = PostAuthorSerializer(instance.author).data
         repr['likes'] = self.get_like(instance)
         repr['rating'] = self.get_rating(instance)
@@ -150,11 +151,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
         model = Favorite
         fields = '__all__'
 
-
-class FavoriteListSerializer(serializers.ModelSerializer):
-    posts = FavoriteSerializer(many=True)
-
-    class Meta:
-        model = FavoriteList
-        fields = '__all__'
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['favorites'] = PostSerializer(Post.objects.filter(favorites=instance.id),
+                                                     many=True, context=self.context).data
+        return representation
 
