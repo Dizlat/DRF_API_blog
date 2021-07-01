@@ -35,9 +35,9 @@ class PostSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
-        repr['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
         repr['likes'] = self.get_like(instance)
         repr['rating'] = self.get_rating(instance)
+        repr['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
         print(repr)
         repr['comment'] = CommentSerializer(instance.comments.all(), many=True, context=self.context).data
         return repr

@@ -7,17 +7,12 @@ from rest_framework.generics import GenericAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from .serializers import *
 from main.permissions import IsAuthorPerm
 
 User = get_user_model()
-
-
-# class ProfileView(ListAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = ProfileSerializer
-#     # permission_classes = [IsAuthorPerm, ]
 
 
 class RegisterView(APIView):
@@ -71,3 +66,9 @@ class ChangePasswordView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.set_new_password(request)
             return Response('Вы успешно сменили пароль', status=status.HTTP_200_OK)
+
+
+class ProfileDetailProfile(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = ProfileSerializer
+

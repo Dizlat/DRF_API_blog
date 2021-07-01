@@ -6,10 +6,22 @@ from rest_framework import serializers
 User = get_user_model()
 
 
-# class ProfileSerializer(serializers.Serializer):
-#     class Meta:
-#         Model = User
-#         fields = '__all__'
+class ProfileListSerializer(serializers.ModelSerializer):
+    class Meta:
+        Model = User
+        fields = ('id', 'email', 'first_name', 'last_name')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not instance.first_name and not instance.last_name:
+            representation['full_name'] = 'Анонимный пользователь'
+        return representation
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        Model = User
+        fields = ('id', 'email', 'first_name', 'last_name')
 
 
 class RegisterSerializer(serializers.ModelSerializer):
