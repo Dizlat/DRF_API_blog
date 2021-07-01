@@ -9,7 +9,7 @@ User = get_user_model()
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name')
+        fields = ('email', 'first_name', 'last_name')
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -21,7 +21,11 @@ class ProfileListSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name')
+        fields = ('first_name', 'last_name')
+
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation['email'] = instance.email
 
 
 class RegisterSerializer(serializers.ModelSerializer):

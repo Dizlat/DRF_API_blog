@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet, GenericViewSet
 
 from .models import *
-from .permissions import IsAuthorPerm
+from .permissions import IsAuthorPerm, IsAuthorImagePerm
 from .serializers import *
 
 
@@ -121,7 +121,7 @@ class PostImageViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permissions = [IsAuthorPerm, ]
+            permissions = [IsAuthorImagePerm, ]
         else:
             permissions = []
         return [permission() for permission in permissions]

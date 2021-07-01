@@ -15,12 +15,24 @@ class PostListSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PostAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not instance.first_name and not instance.last_name:
+            representation['full_name'] = 'Анонимный пользователь'
+        return representation
+
+
 class PostSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format='%d/%m/%y %H:%M:%S', read_only=True)
 
     class Meta:
         model = Post
-        fields = '__all__'
+        exclude = ('author', )
 
     def get_rating(self, instance):
         total_rating = sum(instance.ratings.values_list('rating', flat=True))
@@ -35,6 +47,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         repr = super().to_representation(instance)
+        repr['author'] = PostAuthorSerializer(instance.author).data
         repr['likes'] = self.get_like(instance)
         repr['rating'] = self.get_rating(instance)
         repr['images'] = ImageSerializer(instance.images.all(), many=True, context=self.context).data
@@ -44,6 +57,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
+        print(request.data)
         user_id = request.user.id
         validated_data['author_id'] = user_id
         post = Post.objects.create(**validated_data)
@@ -54,6 +68,7 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = '__all__'
+        # exclude = ('author', )
 
     def _get_image_url(self, obj):
         if obj.image:
@@ -64,6 +79,15 @@ class ImageSerializer(serializers.ModelSerializer):
         else:
             url = ''
         return url
+
+    def destroy(self, validated_data):
+        request = self.context.get('request')
+        print(request.data)
+        user = request.user.id
+        print(user)
+        validated_data['author_id'] = user
+        image = Image.objects.delete(**validated_data)
+        return image
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
