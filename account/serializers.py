@@ -9,7 +9,7 @@ User = get_user_model()
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name')
+        fields = ('id', 'email', 'first_name', 'last_name')
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -21,7 +21,12 @@ class ProfileListSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name')
+        fields = ('email', 'first_name', 'last_name')
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        attrs['email'] = request.user
+        return attrs
 
     # def to_representation(self, instance):
     #     representation = super().to_representation(instance)
