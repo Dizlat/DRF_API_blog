@@ -17,7 +17,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
+
 from main.views import *
+from account.views import ProfileDetailViewSet
 from mid import settings
 
 router = SimpleRouter()
@@ -25,9 +27,10 @@ router.register('categories', CategoryViewSet)
 router.register('posts', PostViewSet)
 router.register('images', PostImageViewSet)
 router.register('favorite', FavoriteView)
+router.register('profile', ProfileDetailViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/account/', include('account.urls')),
+    path('api/v1/', include('account.urls')),
     path('api/v1/', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

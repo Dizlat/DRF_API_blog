@@ -7,7 +7,7 @@ from rest_framework.generics import GenericAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .serializers import *
 from main.permissions import IsAuthorPerm
@@ -68,7 +68,15 @@ class ChangePasswordView(APIView):
             return Response('Вы успешно сменили пароль', status=status.HTTP_200_OK)
 
 
-class ProfileDetailProfile(ModelViewSet):
+class ProfileDetailViewSet(mixins.RetrieveModelMixin,
+                           mixins.UpdateModelMixin,
+                           mixins.ListModelMixin,
+                           GenericViewSet):
     queryset = User.objects.all()
     serializer_class = ProfileSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ProfileListSerializer
+        return self.serializer_class
 

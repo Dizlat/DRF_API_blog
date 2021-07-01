@@ -8,7 +8,7 @@ User = get_user_model()
 
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
-        Model = User
+        model = User
         fields = ('id', 'email', 'first_name', 'last_name')
 
     def to_representation(self, instance):
@@ -20,7 +20,7 @@ class ProfileListSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        Model = User
+        model = User
         fields = ('id', 'email', 'first_name', 'last_name')
 
 
