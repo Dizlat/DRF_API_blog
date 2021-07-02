@@ -1,16 +1,15 @@
 from datetime import timedelta
 
 from django.db.models import Q
-from django.shortcuts import render
 from django.utils import timezone
-from rest_framework import generics, status, mixins
+
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
-from .models import *
-from .permissions import IsAuthorPerm, IsAuthorImagePerm, IsAuthorUserPerm
+from .permissions import IsAuthorPerm, IsAuthorImagePerm
 from .serializers import *
 
 
@@ -111,21 +110,6 @@ class PostViewSet(ModelViewSet):
             favorite.save()
             return Response('Добавлен в избранное')
 
-    # @action(detail=True, methods=['POST'])
-    # def favorite(self, request, pk):
-    #     post = self.get_object()
-    #     user = request.user
-    #     favorite_obj, created = Favorite.objects.get_or_create(post=post, user=user)
-    #
-    #     if favorite_obj.is_favorited:
-    #         favorite_obj.is_favorited = False
-    #         favorite_obj.save()
-    #         return Response('удален из избранного')
-    #     else:
-    #         favorite_obj.is_favorited = True
-    #         favorite_obj.save()
-    #         return Response('добавлен в избраное')
-
 
 class PostImageViewSet(ModelViewSet):
     queryset = Image.objects.all()
@@ -141,18 +125,6 @@ class PostImageViewSet(ModelViewSet):
             permissions = []
         return [permission() for permission in permissions]
 
-
-# class CommentViewSet(mixins.CreateModelMixin,
-#                      mixins.UpdateModelMixin,
-#                      mixins.DestroyModelMixin,
-#                      GenericViewSet):
-#     queryset = Comment.objects.all()
-#     serializer_class = CommentSerializer
-#
-#     def get_permissions(self):
-#         if self.action == 'create':
-#             return [IsAuthenticated, ]
-#         return [IsAuthorPerm, ]
 
 class FavoriteView(ReadOnlyModelViewSet):
     queryset = Favorite.objects.all()

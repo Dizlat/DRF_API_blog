@@ -152,6 +152,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        print(instance)
         representation['favorites'] = PostSerializer(Post.objects.filter(favorites=instance.id),
                                                      many=True, context=self.context).data
         return representation

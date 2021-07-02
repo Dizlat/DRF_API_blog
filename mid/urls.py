@@ -17,10 +17,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
 
 from main.views import *
 from account.views import ProfileDetailViewSet
 from mid import settings
+
 
 router = SimpleRouter()
 router.register('categories', CategoryViewSet)
@@ -29,8 +32,19 @@ router.register('images', PostImageViewSet)
 router.register('favorite', FavoriteView)
 router.register('profile', ProfileDetailViewSet)
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title='My API',
+        default_version='v1',
+        description='My ecommerce API'
+    ),
+    public=True,
+    permission_classes=[AllowAny],
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('account.urls')),
     path('api/v1/', include(router.urls)),
+    path('api/v1/docs/', schema_view.with_ui('swagger'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

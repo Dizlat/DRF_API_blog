@@ -3,14 +3,12 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import status, generics, mixins
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.generics import GenericAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from .serializers import *
-from main.permissions import IsAuthorPerm, IsAuthorUserPerm, IsProfileUser
 
 User = get_user_model()
 
