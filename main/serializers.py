@@ -69,7 +69,6 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = '__all__'
-        # exclude = ('author', )
 
     def _get_image_url(self, obj):
         if obj.image:

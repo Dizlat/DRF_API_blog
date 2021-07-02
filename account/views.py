@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .serializers import *
-from main.permissions import IsAuthorPerm
+from main.permissions import IsAuthorPerm, IsAuthorUserPerm, IsProfileUser
 
 User = get_user_model()
 
@@ -73,6 +73,7 @@ class ProfileDetailViewSet(mixins.RetrieveModelMixin,
                            GenericViewSet):
     queryset = User.objects.all()
     serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated, ]
 
     def get_serializer_class(self):
         if self.action == 'list':

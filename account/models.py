@@ -53,7 +53,7 @@ class User(AbstractBaseUser):
 
     @staticmethod
     def send_activation_email(email, activation_code):
-        message = f'http://localhost:2000/api/v1/activate/?a={activation_code}'
+        message = f'http://localhost:2001/api/v1/activate/?a={activation_code}'
         send_mail('Активация аккаунта', message, 'test@gmail.com', [email, ])
 
 
